@@ -1,0 +1,4 @@
+name,aliases,entityType,country,listSource,program
+"Meridian Shadow Holdings","Meridian Shadow Hldg|MSH Group",ENTITY,PA,SAMPLE-LIST,Corruption
+"Tomasz Wierzbicki","Tomas Wierzbicki|T. Wierzbicki",INDIVIDUAL,PL,SAMPLE-LIST,Fraud
+"Sable Horizon Maritime","Sable Horizon Shipping",VESSEL,KP,SAMPLE-LIST,DPRK

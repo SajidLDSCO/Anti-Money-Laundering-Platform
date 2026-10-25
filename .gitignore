@@ -1,0 +1,14 @@
+# backend
+backend/target/
+# local secrets (SMTP password etc.), see backend/local.properties.example
+backend/local.properties
+*.class
+# frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store

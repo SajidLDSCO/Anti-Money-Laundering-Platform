@@ -1,0 +1,105 @@
+server:
+  port: 8080
+  servlet:
+    session:
+      timeout: 30m
+      cookie:
+        http-only: true
+        same-site: lax
+        secure: ${SESSION_COOKIE_SECURE:false}   # set true behind HTTPS
+
+spring:
+  application:
+    name: aml-backend
+  # Machine-specific settings and secrets (e.g. SMTP login), kept out of git.
+  # Copy local.properties.example to local.properties in the directory you start the backend from.
+  config:
+    import: optional:file:${AML_LOCAL_CONFIG:./local.properties}
+  datasource:
+    url: jdbc:h2:mem:amldb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  servlet:
+    multipart:
+      max-file-size: 10MB
+  # SMTP for email notifications. Mail is only sent when a host is set, through the
+  # environment: SPRING_MAIL_HOST, SPRING_MAIL_PORT, SPRING_MAIL_USERNAME, SPRING_MAIL_PASSWORD.
+  # (No host default here on purpose: an empty host would still enable a broken sender.)
+  mail:
+    properties:
+      mail.smtp.auth: ${MAIL_SMTP_AUTH:false}
+      mail.smtp.starttls.enable: ${MAIL_SMTP_STARTTLS:false}
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 10000
+      mail.smtp.writetimeout: 10000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  health:
+    mail:
+      enabled: false   # otherwise every health check opens a connection to the SMTP server
+
+# ---------------------------------------------------------------------------
+# AML detection configuration. Every threshold here is a starting point:
+# tune them to your institution's risk appetite, currency and local regulation
+# (e.g. the CTR threshold your Financial Intelligence Unit sets).
+# ---------------------------------------------------------------------------
+aml:
+  seed-demo-data: true
+  cors-allowed-origins: http://localhost:4200
+  security:
+    # New sign-ups get the ANALYST role. With approval on, they cannot sign in until an admin enables them.
+    signup-requires-approval: ${AML_SIGNUP_REQUIRES_APPROVAL:true}
+    # Created on startup if there is no enabled admin. Leave the password empty to skip.
+    bootstrap-admin-username: ${AML_ADMIN_USERNAME:admin}
+    bootstrap-admin-password: ${AML_ADMIN_PASSWORD:}
+    # Where admin notifications (e.g. new sign-ups) go. Also applied to the demo admin.
+    bootstrap-admin-email: ${AML_ADMIN_EMAIL:}
+  mail:
+    enabled: ${MAIL_ENABLED:true}
+    from: ${MAIL_FROM:AML Monitor <no-reply@aml.local>}
+    # Base URL of the web app, for links in notification emails.
+    app-url: ${APP_URL:http://localhost:4200}
+  rules:
+    large-cash-threshold: 10000
+    structuring:
+      window-hours: 48
+      min-transactions: 3
+      lower-bound-ratio: 0.7        # deposits between 70% and 100% of the cash threshold count as "just under"
+    velocity:
+      window-hours: 1
+      max-transactions: 5
+      daily-volume-limit: 50000
+    pep-threshold: 5000
+    round-amount-minimum: 5000
+    rapid-movement:
+      window-hours: 48
+      match-ratio: 0.85             # outbound >= 85% of a recent inbound credit
+      minimum-amount: 5000
+    unusual-amount:
+      lookback-days: 90
+      min-history: 5
+      multiplier: 5
+    sanctions-match-threshold: 0.88
+  scoring:
+    flag-threshold: 40
+    block-threshold: 80
+  # Sample list only. Keep this in sync with the current FATF "high-risk" and
+  # "increased monitoring" lists and your regulator's own designations.
+  high-risk-countries: KP,IR,MM
+  increased-monitoring-countries: SY,YE,VE,HT,SS,ML
+  high-risk-occupations: money service,casino,gambling,precious metals,jewel,arms,crypto,real estate,used car,art dealer

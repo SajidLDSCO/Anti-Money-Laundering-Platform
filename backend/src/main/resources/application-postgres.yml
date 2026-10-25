@@ -1,0 +1,15 @@
+# Run with: SPRING_PROFILES_ACTIVE=postgres ./mvnw spring-boot:run
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/aml}
+    username: ${DB_USER:aml}
+    password: ${DB_PASSWORD:aml}
+  jpa:
+    hibernate:
+      ddl-auto: update
+  h2:
+    console:
+      enabled: false
+
+aml:
+  seed-demo-data: false

@@ -1,0 +1,19 @@
+# Copy this file to local.properties (same folder) and fill it in. local.properties is ignored by git.
+# The backend reads it on startup when run from this folder (mvn spring-boot:run).
+
+# --- Gmail -------------------------------------------------------------------
+# Use an App Password, not your Google password:
+# Google Account -> Security -> 2-Step Verification (must be on) -> App passwords.
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=you@gmail.com
+spring.mail.password=xxxx xxxx xxxx xxxx
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+# Gmail rewrites the sender to your account, so use the same address here.
+aml.mail.from=AML Monitor <you@gmail.com>
+
+# --- Receiving notifications --------------------------------------------------
+# The admin account gets this email, so "new sign-up waiting for approval" messages reach you.
+# Sign up test accounts with another address; Gmail's plus aliases work (you+test1@gmail.com).
+aml.security.bootstrap-admin-email=you@gmail.com
